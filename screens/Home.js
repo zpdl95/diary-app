@@ -6,7 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 const View = styled.View`
   flex: 1;
   background-color: ${colors.bgColor};
-  padding: 0px 50px;
+  padding: 0px 30px;
   padding-top: 50px;
 `;
 const Title = styled.Text`
@@ -24,7 +24,7 @@ const Btn = styled.TouchableOpacity`
   background-color: ${colors.btnColor};
   justify-content: center;
   align-items: center;
-  elevation: 7;
+  elevation: 5;
 `;
 
 const Home = ({ navigation: { navigate } }) => (
