@@ -1,3 +1,4 @@
+import { AdMobInterstitial, AdMobRewarded } from "expo-ads-admob";
 import React, { useState } from "react";
 import { Alert } from "react-native";
 import styled from "styled-components/native";
@@ -66,7 +67,7 @@ const Write = ({ navigation: { goBack } }) => {
 
   const onChangeText = (text) => setFeelings(text);
   const onEmotionPress = (face) => setSelectedEmotion(face);
-  const onSubmit = () => {
+  const onSubmit = async () => {
     if (feelings === "" || selectedEmotion === null) {
       return Alert.alert("Please complete form");
     }
@@ -77,6 +78,12 @@ const Write = ({ navigation: { goBack } }) => {
         message: feelings,
       });
     });
+    /* 전면광고용 ID설정 */
+    await AdMobRewarded.setAdUnitID("ca-app-pub-3940256099942544/5224354917");
+    /* 광고 요청 */
+    await AdMobRewarded.requestAdAsync({ servePersonalizedAds: true });
+    /* 광고 보여주기 */
+    await AdMobRewarded.showAdAsync();
     goBack();
   };
   return (

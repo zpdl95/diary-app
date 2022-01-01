@@ -7,11 +7,14 @@ import {
   UIManager,
 } from "react-native";
 import styled from "styled-components/native";
+import { AdMobBanner } from "expo-ads-admob";
 import colors from "../colors";
 import { Ionicons } from "@expo/vector-icons";
 import { useDB } from "../context";
 const View = styled.View`
   flex: 1;
+  justify-content: center;
+  align-items: center;
   background-color: ${colors.bgColor};
   padding: 0px 30px;
   padding-top: 50px;
@@ -19,12 +22,12 @@ const View = styled.View`
 const Title = styled.Text`
   color: ${colors.textColor};
   font-size: 39px;
-  margin-bottom: 100px;
+  width: 100%;
 `;
 const Btn = styled.TouchableOpacity`
   position: absolute;
-  bottom: 50px;
-  right: 50px;
+  bottom: 35px;
+  right: 35px;
   height: 60px;
   width: 60px;
   border-radius: 40px;
@@ -94,7 +97,20 @@ const Home = ({ navigation: { navigate } }) => {
   return (
     <View>
       <Title>Home</Title>
+      <AdMobBanner
+        /* ↑ 배너광고컴포넌트 */
+        style={{
+          backgroundColor: "#9c88ff",
+          borderColor: "#291E5F",
+          borderWidth: 3,
+        }}
+        bannerSize="fullBanner"
+        /* Test ID, Replace with your-admob-unit-id
+        광고의 형태에 따라 운영체제에 따라 사용하는 ID도 다르다 */
+        adUnitID="ca-app-pub-3940256099942544/6300978111"
+      />
       <FlatList
+        style={{ marginVertical: 50, width: "100%" }}
         contentContainerStyle={{ paddingVertical: 10 }}
         ItemSeparatorComponent={Separator}
         data={feelings}

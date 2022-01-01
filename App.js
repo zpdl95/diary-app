@@ -4,6 +4,7 @@ import Navigator from "./navigator";
 import Realm from "realm";
 import AppLoading from "expo-app-loading";
 import { DBContext } from "./context";
+import { setTestDeviceIDAsync } from "expo-ads-admob";
 
 /* DB의 형태인 Schema 생성 */
 const FeelingSchema = {
@@ -20,6 +21,8 @@ export default function App() {
   const [ready, setReady] = useState(false);
   const [realm, setRealm] = useState(null);
   const startLoading = async () => {
+    /*Admob를 사용하기위해 글로벌테스트 ID를 설정 */
+    await setTestDeviceIDAsync("EMULATOR");
     /* realm DB에 연결 */
     const connection = await Realm.open({
       path: "nomadDiaryDB",
