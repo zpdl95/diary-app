@@ -1,10 +1,15 @@
 import React, { useEffect, useState } from "react";
+import {
+  FlatList,
+  LayoutAnimation,
+  Platform,
+  TouchableOpacity,
+  UIManager,
+} from "react-native";
 import styled from "styled-components/native";
 import colors from "../colors";
 import { Ionicons } from "@expo/vector-icons";
 import { useDB } from "../context";
-import { FlatList } from "react-native";
-
 const View = styled.View`
   flex: 1;
   background-color: ${colors.bgColor};
@@ -50,6 +55,14 @@ const Separator = styled.View`
   height: 15px;
 `;
 
+/* LayoutAnimation을 사용할때 안드로이드 사용자는 설정해야하는 옵션 */
+if (
+  Platform.OS === "android" &&
+  UIManager.setLayoutAnimationEnabledExperimental
+) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
+
 const Home = ({ navigation: { navigate } }) => {
   const realm = useDB();
   const [feelings, setFeelings] = useState([]);
@@ -57,12 +70,12 @@ const Home = ({ navigation: { navigate } }) => {
   /* 컴포넌트가 마운트됐을때 */
   useEffect(() => {
     const feelings = realm.objects("Feeling");
-    setFeelings(feelings);
 
     /* 변경사항을 볼 수 있는 이벤트 핸들러 */
-    feelings.addListener(() => {
-      const feelings = realm.objects("Feeling");
-      setFeelings(feelings);
+    feelings.addListener((feelings, changes) => {
+      /* state를 변경할때 나타날 layout변화를 animate하고 싶으면 사용 */
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
+      setFeelings(feelings.sorted("_id", true));
     });
 
     /* 컴포넌트가 언마운트됐을때 */
@@ -71,6 +84,13 @@ const Home = ({ navigation: { navigate } }) => {
     };
   }, []);
 
+  const onPress = (id) => {
+    realm.write(() => {
+      const feeling = realm.objectForPrimaryKey("Feeling", id);
+      realm.delete(feeling);
+    });
+  };
+
   return (
     <View>
       <Title>Home</Title>
@@ -78,12 +98,14 @@ const Home = ({ navigation: { navigate } }) => {
         contentContainerStyle={{ paddingVertical: 10 }}
         ItemSeparatorComponent={Separator}
         data={feelings}
-        keyExtractor={(feeling) => feeling._id}
+        keyExtractor={(feeling) => feeling._id + ""}
         renderItem={({ item }) => (
-          <Record>
-            <Emotion>{item.emotion}</Emotion>
-            <Message>{item.message}</Message>
-          </Record>
+          <TouchableOpacity onPress={() => onPress(item._id)}>
+            <Record>
+              <Emotion>{item.emotion}</Emotion>
+              <Message>{item.message}</Message>
+            </Record>
+          </TouchableOpacity>
         )}
       />
       <Btn onPress={() => navigate("Write")}>
