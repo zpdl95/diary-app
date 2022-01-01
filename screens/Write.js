@@ -71,20 +71,27 @@ const Write = ({ navigation: { goBack } }) => {
     if (feelings === "" || selectedEmotion === null) {
       return Alert.alert("Please complete form");
     }
-    realm.write(() => {
-      const feeling = realm.create("Feeling", {
-        _id: Date.now(),
-        emotion: selectedEmotion,
-        message: feelings,
-      });
-    });
     /* 전면광고용 ID설정 */
     await AdMobRewarded.setAdUnitID("ca-app-pub-3940256099942544/5224354917");
     /* 광고 요청 */
     await AdMobRewarded.requestAdAsync({ servePersonalizedAds: true });
     /* 광고 보여주기 */
     await AdMobRewarded.showAdAsync();
-    goBack();
+    /* 보상형광고의 이벤트를 듣는 방법
+    보상을 받는 시점에 실행 */
+    AdMobRewarded.addEventListener("rewardedVideoUserDidEarnReward", () =>
+      /* 보상을 무시하는 시점에 실행 */
+      AdMobRewarded.addEventListener("rewardedVideoDidDismiss", () => {
+        realm.write(() => {
+          const feeling = realm.create("Feeling", {
+            _id: Date.now(),
+            emotion: selectedEmotion,
+            message: feelings,
+          });
+        });
+        goBack();
+      })
+    );
   };
   return (
     <View>
